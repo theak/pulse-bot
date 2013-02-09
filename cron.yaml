@@ -1,0 +1,4 @@
+cron:
+- description: prober job
+  url: /ping
+  schedule: every 2 minutes

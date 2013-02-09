@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if monitors %}
+<table class="table">
+  <tr><th>Name</th><th>URL</th><th>Configure</th></tr>
+  {% for monitor in monitors %}
+  <form method="POST" action="/">
+    <input type="hidden" name="key" value="{{ monitor.key.id }}"/>
+    <input type="hidden" name="action" value="delete"/>
+    <tr><td>{{ monitor.name }}</td><td>{{ monitor.url }}</td><td><input type="submit" value="Delete" class="btn"></div></td></tr>
+  </form>
+  {% endfor %}
+</table>
+{% else %}
+<h3>You have no monitors configured! Click "Add new monitor" to get started.</h3>
+{% endif %}
+<aiv class="btn btn-primary" data-toggle="modal" data-target="#myModal">Add new monitor</div>
+<!-- Modal -->
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Add New Monitor</h3>
+  </div>
+  <form method="POST" action="/">
+  <div class="modal-body">
+      <input type="hidden" name="action" value="add" />
+      <label for="name">Name:</label>
+      <input type="text" placeholder="My Awesome Monitor" name="name" class="input-large" id="name" />
+      <label for="name">Url to ping:</label>
+      <input type="text" placeholder="http://example.com:1234" name="url" class="input-large" id="url" />
+  </div>
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
+    <input type="submit" class="btn btn-primary" value="Add"></input>
+  </div>
+  </form>
+</div>
+
+{% endblock %}

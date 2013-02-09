@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block header %}
+<link type="text/css" rel="stylesheet" href="/assets/css/rickshaw.min.css">
+<script src="http://d3js.org/d3.v2.min.js"></script>
+<script src="/assets/js/rickshaw.min.js"></script>
+{% endblock %}
+
+{% block content %}
+{% if monitors %}
+{% for monitor in monitors %}
+  <h3>{{ monitor.name }}</h3>
+  <div id="chart_{{ monitor.key.id }}"></div>
+  <div id="legend_{{ monitor.key.id }}"></div>
+  <script defer="defer">
+  var latency_{{ monitor.key.id }} = [{% for datapoint in datapoints.0 %}
+    {x: {{ datapoint.get_time }}, y: {{ datapoint.latency }} },
+  {% endfor %}];
+  /*
+  var uptime_{{ monitor.key.id }} = [{% for datapoint in datapoints.0 %}
+    {x: {{ datapoint.get_time }}, y: {{ datapoint.get_up }} },
+  {% endfor %}];
+  */
+  var graph_{{ monitor.key.id }} = new Rickshaw.Graph({
+    element: document.querySelector("#chart_{{ monitor.key.id }}"),
+    width: 650,
+    height: 120,
+    renderer: 'line',
+    interpolation: 'step-after',
+    series: [{color: 'steelblue', data: latency_{{ monitor.key.id }}, name: 'Ping Latency' }]
+             //{color: 'orange', data: uptime_{{ monitor.key.id }}, name: 'Uptime' }]
+  });
+  var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+    graph: graph_{{ monitor.key.id }}
+  } );
+  graph_{{ monitor.key.id }}.render();
+
+var legend_{{ monitor.key.id }} = new Rickshaw.Graph.Legend( {
+  graph: graph_{{ monitor.key.id }},
+  element: document.getElementById('legend_{{ monitor.key.id }}')
+} );
+
+var axes_{{ monitor.key.id }} = new Rickshaw.Graph.Axis.Time( {
+  graph: graph_{{ monitor.key.id }}
+} );
+axes_{{ monitor.key.id }}.render();
+
+  </script>
+{% endfor %}
+{% else %}
+<h3>You have no monitors configured! <br/> Visit the 'Configure' tab to get started.</h3>
+{% endif %}
+
+{% endblock %}
