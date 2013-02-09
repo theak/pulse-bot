@@ -13,14 +13,9 @@
   <div id="chart_{{ monitor.key.id }}"></div>
   <div id="legend_{{ monitor.key.id }}"></div>
   <script defer="defer">
-  var latency_{{ monitor.key.id }} = [{% for datapoint in datapoints.0 %}
-    {x: {{ datapoint.get_time }}, y: {{ datapoint.latency }} },
-  {% endfor %}];
-  /*
-  var uptime_{{ monitor.key.id }} = [{% for datapoint in datapoints.0 %}
-    {x: {{ datapoint.get_time }}, y: {{ datapoint.get_up }} },
-  {% endfor %}];
-  */
+  {{ datapoints }}
+  var latency_{{ monitor.key.id }} = [{% for datapoint in monitor.get_datapoints %}{x: {{ datapoint.get_time }}, y: {{ datapoint.latency }}},{% endfor %}];
+
   var graph_{{ monitor.key.id }} = new Rickshaw.Graph({
     element: document.querySelector("#chart_{{ monitor.key.id }}"),
     width: 650,

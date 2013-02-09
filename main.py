@@ -17,7 +17,7 @@ class MainPage(webapp.RequestHandler):
         if user and "dashboard" in self.request.path:
             page = template.render("templates/dashboard.html", {"page": 1, "logout": users.create_logout_url("/"), "user": user, 
                                                                 "monitors": monitors,
-                                                                "datapoints": [monitor.get_datapoints() for monitor in monitors]})
+                                                                "datapoint_dict": [monitor.get_datapoints() for monitor in monitors]})
         elif user:
             page = template.render("templates/monitors.html", {"page": 0, "logout": users.create_logout_url("/"), "user": user, "monitors": monitors})
         else:

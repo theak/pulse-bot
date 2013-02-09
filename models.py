@@ -2,7 +2,7 @@ from google.appengine.ext import db
 
 import time
 
-DATA_LIMIT = 100
+DATA_LIMIT = 1000
 
 class Monitor(db.Model):
   name = db.StringProperty(required=True)
@@ -10,7 +10,7 @@ class Monitor(db.Model):
   url = db.StringProperty(required=True)
   regexp = db.StringProperty()
   def get_datapoints(self):
-    return self.datapoint_set.order('time').fetch(limit=DATA_LIMIT)
+    return DataPoint.all().filter("monitor =", self).order("time").fetch(limit=DATA_LIMIT)
 
 class DataPoint(db.Model):
   monitor = db.ReferenceProperty(Monitor)
