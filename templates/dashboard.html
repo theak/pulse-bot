@@ -8,42 +8,68 @@
 
 {% block content %}
 {% if monitors %}
+<a href="/ping?redirect=true" class="btn">Fetch new data</a>
 {% for monitor in monitors %}
   <h3>{{ monitor.name }}</h3>
-  <div id="chart_{{ monitor.key.id }}"></div>
-  <div id="legend_{{ monitor.key.id }}"></div>
+  <div id="chart_{{ monitor.id }}"></div>
+  <div id="legend_{{ monitor.id }}"></div>
   <script defer="defer">
-  {{ datapoints }}
-  var latency_{{ monitor.key.id }} = [{% for datapoint in monitor.get_datapoints %}{x: {{ datapoint.get_time }}, y: {{ datapoint.latency }}},{% endfor %}];
-
-  var graph_{{ monitor.key.id }} = new Rickshaw.Graph({
-    element: document.querySelector("#chart_{{ monitor.key.id }}"),
+  var graph_{{ monitor.id }} = new Rickshaw.Graph({
+    element: document.querySelector("#chart_{{ monitor.id }}"),
     width: 650,
     height: 120,
     renderer: 'line',
     interpolation: 'step-after',
-    series: [{color: 'steelblue', data: latency_{{ monitor.key.id }}, name: 'Ping Latency' }]
-             //{color: 'orange', data: uptime_{{ monitor.key.id }}, name: 'Uptime' }]
+    series: [{color: 'steelblue', data: {{ monitor.datapoints|safe }}, name: 'Ping Latency' }]
   });
+
   var hoverDetail = new Rickshaw.Graph.HoverDetail( {
-    graph: graph_{{ monitor.key.id }}
-  } );
-  graph_{{ monitor.key.id }}.render();
+    graph: graph_{{ monitor.id }}
+  });
 
-var legend_{{ monitor.key.id }} = new Rickshaw.Graph.Legend( {
-  graph: graph_{{ monitor.key.id }},
-  element: document.getElementById('legend_{{ monitor.key.id }}')
-} );
+  graph_{{ monitor.id }}.render();
 
-var axes_{{ monitor.key.id }} = new Rickshaw.Graph.Axis.Time( {
-  graph: graph_{{ monitor.key.id }}
-} );
-axes_{{ monitor.key.id }}.render();
+  var legend_{{ monitor.id }} = new Rickshaw.Graph.Legend({
+    graph: graph_{{ monitor.id }},
+    element: document.getElementById('legend_{{ monitor.id }}') });
 
+  var axes_{{ monitor.id }} = new Rickshaw.Graph.Axis.Time({
+    graph: graph_{{ monitor.id }} });
+
+  axes_{{ monitor.id }}.render();
   </script>
+  <div class="row-fluid show-grid">
+    <div class="span4">
+      <h5 class="muted">Current Status</h5>
+      <table style="font-size: 14px">
+	<tr class="{% if monitor.status %}green{% else %}red{% endif %}">
+	  <td><div class="circle"></div></td>
+	  <td><b>{% if monitor.status %}Active{% else %}Down{% endif %}</b></td>
+	</tr>
+      </table>      
+    </div>
+    <div class="span4">
+      <h5 class="muted">Uptime Stats</h5>
+      <table style="font-size: 14px">
+	<tr><td><b>All time</b></td><td style="font-size: 20px; padding: 4px">{{ monitor.uptimes.0 }}%</td></tr>
+      </table>
+    </div>
+    <div class="span4">
+      <h5 class="muted">Outages</h5>
+      <table style="font-size: 14px">
+      {% if monitor.outages %}
+	{% for outage in monitor.outages %}
+        <tr><td style="padding: 4px">{{ outage }}</td></tr>
+	{% endfor %}
+      {% else %}
+        <tr><td style="padding: 4px"><b>No Outages</b></td></tr>
+      {% endif %}
+      </table>
+    </div>
+    <br/>
+  </div>
 {% endfor %}
 {% else %}
 <h3>You have no monitors configured! <br/> Visit the 'Configure' tab to get started.</h3>
 {% endif %}
-
 {% endblock %}

@@ -675,9 +675,30 @@ cite {
 }
 
 .muted {
-  color: #999999;
+  color: #666;
 }
 
+.circle {
+  width: 15px;
+  height: 15px;
+  border-radius: 10px;
+  border-width: 2px;
+  margin: 5px;
+}
+.green {
+  color: green;
+  border-color: green;
+}
+.green div.circle {
+  background-color: green;
+}
+.red {
+  color: red;
+  border-bolor: red;
+}
+.red div.circle {
+  background-color: red;
+}
 a.muted:hover {
   color: #808080;
 }

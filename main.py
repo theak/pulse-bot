@@ -7,6 +7,7 @@ import models
 import webapp2 as webapp
 from google.appengine.ext.webapp import template
 from google.appengine.api import users
+from json import dumps
 
 ''' Servlet Classes- Keep strings here hardcoded for easy readability '''
 class MainPage(webapp.RequestHandler):
@@ -14,14 +15,17 @@ class MainPage(webapp.RequestHandler):
         user = users.get_current_user()
         page = None
         monitors = models.get_monitors()
+        page_data = {"logout": users.create_logout_url("/"), "user": user, "login": users.create_login_url(self.request.uri)}
         if user and "dashboard" in self.request.path:
-            page = template.render("templates/dashboard.html", {"page": 1, "logout": users.create_logout_url("/"), "user": user, 
-                                                                "monitors": monitors,
-                                                                "datapoint_dict": [monitor.get_datapoints() for monitor in monitors]})
+            page_data["page"] = 1
+            page_data["monitors"] = models.get_monitoring_data()
+            page = template.render("templates/dashboard.html", page_data)
         elif user:
-            page = template.render("templates/monitors.html", {"page": 0, "logout": users.create_logout_url("/"), "user": user, "monitors": monitors})
+            page_data["page"] = 0
+            page_data["monitors"] = models.get_monitors()
+            page = template.render("templates/monitors.html", page_data)
         else:
-           page = template.render("templates/index.html", {"login": users.create_login_url(self.request.uri)}) 
+           page = template.render("templates/index.html", page_data)
         self.response.out.write(page)
 
     def post(self):
@@ -39,6 +43,7 @@ class MainPage(webapp.RequestHandler):
 class PingPage(webapp.RequestHandler):
     def get(self):
         prober.update_all()
+        if self.request.get("redirect"): self.redirect("/dashboard")    
 
 application = webapp.WSGIApplication(
         [('/', MainPage),
