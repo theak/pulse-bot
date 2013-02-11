@@ -46,23 +46,22 @@ def get_monitoring_data():
     uptime_count = 0
     total_count = 0
     outages = []
-    status = None
+    last_status = True
     #populate these variables
     for datapoint in monitor.get_datapoints():
       time = datapoint.get_time()
-      status = datapoint.success
       data["datapoints"].append(
         {'x': time, 'y': int(datapoint.latency)})
-      if not status:
-        outages.append(datapoint.time)
+      if not datapoint.success:
+        if last_status: outages.append(datapoint.time)
       else:
         uptime_count += 1
       total_count += 1
+      last_status = datapoint.success
     #store them
     data["uptimes"].append(get_percent(uptime_count, total_count))
-    outages.reverse()
-    data["outages"] = outages
-    data["status"] = status
+    data["outages"] = [outages.pop() for i in range(0, min(3, len(outages)))]
+    data["status"] = last_status
     out.append(data)
     index += 1
   return out

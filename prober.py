@@ -17,10 +17,14 @@ def break_cache(url):
 #todo: regexp support not yet implemented
 def test(url, regexp, breakcache):
   start_time = ms_time()
+  perform_fetch = lambda: fetch(break_cache(url) if breakcache else url)
   try:
-    fetch(break_cache(url) if breakcache else url)
+    perform_fetch()
   except:
-    return False, ms_time() - start_time
+    try:
+      perform_fetch() #try again
+    except:
+      return False, ms_time() - start_time
   return True, ms_time() - start_time
 
 def update(monitor):
