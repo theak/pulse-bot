@@ -9,7 +9,6 @@ from google.appengine.ext.webapp import template
 from google.appengine.api import users
 from json import dumps
 
-''' Servlet Classes- Keep strings here hardcoded for easy readability '''
 class MainPage(webapp.RequestHandler):
     def get(self):
         user = users.get_current_user()
