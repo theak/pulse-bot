@@ -10,6 +10,7 @@ class Monitor(db.Model):
   url = db.StringProperty(required=True)
   regexp = db.StringProperty()
   active = db.BooleanProperty(default=True)
+  breakcache = db.BooleanProperty(default=True)
   def get_datapoints(self):
     return DataPoint.all().filter("monitor =", self).order("time").fetch(limit=DATA_LIMIT)
 
@@ -27,7 +28,10 @@ def get_monitors():
   return Monitor.all().fetch(limit=DATA_LIMIT)
 
 def get_percent(numerator, denominator):
-  return str(float(numerator) / denominator * 100)[0:6]
+  try:
+    return str(float(numerator) / denominator * 100)[0:6]
+  except:
+    return str(0.0)
 
 def get_monitoring_data():
   out = []
@@ -50,7 +54,7 @@ def get_monitoring_data():
       data["datapoints"].append(
         {'x': time, 'y': int(datapoint.latency)})
       if not status:
-        outages.append(time)
+        outages.append(datapoint.time)
       else:
         uptime_count += 1
       total_count += 1
